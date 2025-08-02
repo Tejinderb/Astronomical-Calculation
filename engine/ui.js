@@ -615,18 +615,13 @@ function bindAutocomplete(input, box) {
         if (q.length < 2) { box.classList.add('hidden'); return; }
         timer = setTimeout(async () => {
             try {
-                const res = await fetch(
-                    `https://cors-anywhere.herokuapp.com/https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5`
-                );
-                const data = await res.json();
-                const suggestions = data.map(item => ({
-                    display_name: item.display_name,
-                    lat: item.lat,
-                    lon: item.lon
-                }));
-                showLocationSuggestions(suggestions, box, input);
+                const suggestion = await astrology.searchLocations(q);
+                showLocationSuggestions(suggestion, box, input);
+                // const res = await fetch(
+                //     `https://cors-anywhere.herokuapp.com/https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5;
             } catch (error) {
-                console.log('CORS or network error:', error);
+                console.log('Location Search Error:',error);
+                // console.log('CORS or network error:', error);
                 box.classList.add('hidden');
             }
         }, 300);
@@ -639,7 +634,7 @@ function showLocationSuggestions(suggestions, suggestionsDiv, inputElement) {
     console.log('Showing suggestions:', suggestions);
     // Critical functionality: handle all suggestion states properly
     if (!suggestions || suggestions.length === 0) {
-        console.log('No suggestions to show, hiding dropdown');
+        // console.log('No suggestions to show, hiding dropdown');
         suggestionsDiv.classList.add('hidden');
         return;
     }
@@ -746,5 +741,7 @@ async function saveSettings() {
     
     // Refresh matches if on matches screen
     const matchesScreen = document.getElementById('matchesScreen');
-    findMatches();
+    if(!matchesScreen.classList.contains('hidden')){
+        findMatches();
+    }
 }
